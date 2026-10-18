@@ -7,17 +7,6 @@
         ResizeMode="NoResize"
         Background="#1B2838">
 
-    <Window.Resources>
-        <!-- Estilo para etiquetas -->
-        <Style x:Key="FieldLabel" TargetType="TextBlock">
-            <Setter Property="Foreground" Value="#C7D5E0"/>
-            <Setter Property="FontSize" Value="13"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Margin" Value="0,0,0,6"/>
-        </Style>
-
-        <!-- Estilo base para cajas de entrada -->
-        <Style x:Key="InputField" TargetType="Control">
             <Setter Property="Background" Value="#171A21"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
             <Setter Property="BorderBrush" Value="#314B60"/>
@@ -34,7 +23,6 @@
 
     <!-- Contenedor principal centrado -->
     <Grid Margin="30">
-        <!-- Tarjeta de Login -->
         <Border Background="#1A2530" CornerRadius="12" 
                 BorderBrush="#314B60" BorderThickness="1.5" 
                 Padding="30,25" VerticalAlignment="Center">
