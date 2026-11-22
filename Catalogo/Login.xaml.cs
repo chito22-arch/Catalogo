@@ -1,66 +1,121 @@
 ﻿using System.Windows;
 using System.Windows.Media;
+using MySql.Data.MySqlClient;
 
 namespace Catalogo
 {
     public partial class Login : Window
     {
-        // REQUISITO TÉCNICO PDF: Simulación de usuarios en memoria (string[,])
-        private readonly string[,] usuariosRegistrados = new string[,]
-        {
-            { "admin", "1234" },
-            { "jugador1", "pass2024" },
-            { "profesor", "dam123" }
-        };
+        // Práctica 3: se elimina la matriz en memoria de la Práctica 2.
+        // Las credenciales se validan contra la tabla Usuarios de MySQL (DatabaseHelper).
+
+        private const string MSG_ERROR_CONEXION =
+            "No se ha podido conectar con la base de datos.\n" +
+            "Compruebe que el servicio de MySQL está iniciado e inténtelo de nuevo.";
 
         public Login()
         {
             InitializeComponent();
         }
 
-        private void BtnLogin_Click(object sender, RoutedEventArgs e)
+        private bool CamposRellenos(out string usuario, out string contrasena)
         {
-            string usuario = txtUsuario.Text.Trim();
-            string contrasena = txtPassword.Password;
+            usuario = txtUsuario.Text.Trim();
+            contrasena = txtPassword.Password;
 
-            // 1. Verificación de campos vacíos
+            // TC 01: campos vacíos -> mensaje por ventana y NO se consulta la BD
             if (string.IsNullOrEmpty(usuario) || string.IsNullOrEmpty(contrasena))
             {
-                MostrarMensaje("Debe completar todos los campos.", Brushes.IndianRed);
-                return;
+                MostrarMensaje("Introduzca datos", Brushes.OrangeRed);
+                MessageBox.Show("Introduzca datos", "Campos vacíos",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+                return false;
             }
+            return true;
+        }
 
-            // 2. Validación de credenciales recorriendo la matriz string[,]
-            bool autenticado = false;
-            for (int i = 0; i < usuariosRegistrados.GetLength(0); i++)
+        private void BtnLogin_Click(object sender, RoutedEventArgs e)
+        {
+            if (!CamposRellenos(out string usuario, out string contrasena)) return;
+
+            try
             {
-                if (usuariosRegistrados[i, 0] == usuario && usuariosRegistrados[i, 1] == contrasena)
+                // TC 03 / TC 04 / TC 07 / TC 09: consulta parametrizada
+                if (DatabaseHelper.ValidarUsuario(usuario, contrasena))
                 {
-                    autenticado = true;
-                    break;
+                    MostrarMensaje("Inicio de sesión exitoso", Brushes.LightGreen);
+                    MessageBox.Show($"Bienvenido, {usuario}", "Inicio de sesión exitoso",
+                        MessageBoxButton.OK, MessageBoxImage.Information);
+
+                    Home ventanaHome = new Home(usuario);
+                    ventanaHome.Show();
+                    this.Close();
+                }
+                else
+                {
+                    MostrarMensaje("Usuario o contraseña incorrectos", Brushes.IndianRed);
+                    MessageBox.Show("Usuario o contraseña incorrectos", "Error de inicio de sesión",
+                        MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
-
-            if (autenticado)
+            catch (MySqlException)
             {
-                MostrarMensaje("¡Acceso concedido! Redirigiendo...", Brushes.LightGreen);
-
-                // Abrir pantalla principal pasando el usuario autenticado
-                Home ventanaHome = new Home(usuario);
-                ventanaHome.Show();
-
-                this.Close();
+                // TC 08: MySQL no disponible -> mensaje claro, la aplicación sigue abierta
+                MostrarErrorConexion();
             }
-            else
+            catch (Exception ex)
             {
-                MostrarMensaje("Usuario o contraseña incorrectos.", Brushes.IndianRed);
+                MostrarMensaje("Error inesperado", Brushes.Red);
+                MessageBox.Show("Se ha producido un error inesperado:\n" + ex.Message, "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
+        private void BtnNuevoUsuario_Click(object sender, RoutedEventArgs e)
+        {
+            if (!CamposRellenos(out string usuario, out string contrasena)) return;
+
+            try
+            {
+                // TC 06: aviso de duplicado
+                if (DatabaseHelper.ExisteUsuario(usuario) ||
+                    !DatabaseHelper.InsertarUsuario(usuario, contrasena))
+                {
+                    MostrarMensaje("El usuario ya existe", Brushes.OrangeRed);
+                    MessageBox.Show("El usuario ya existe", "Alta de usuario",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // TC 05: alta correcta
+                MostrarMensaje($"Usuario '{usuario}' dado de alta correctamente", Brushes.LightGreen);
+                MessageBox.Show($"Usuario '{usuario}' dado de alta correctamente", "Alta de usuario",
+                    MessageBoxButton.OK, MessageBoxImage.Information);
+                txtPassword.Clear();
+            }
+            catch (MySqlException)
+            {
+                MostrarErrorConexion();
+            }
+            catch (Exception ex)
+            {
+                MostrarMensaje("Error inesperado", Brushes.Red);
+                MessageBox.Show("Se ha producido un error inesperado:\n" + ex.Message, "Error",
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        // TC 02: Salir de la aplicación
         private void BtnSalir_Click(object sender, RoutedEventArgs e)
         {
-            // Cierra toda la aplicación
             Application.Current.Shutdown();
+        }
+
+        private void MostrarErrorConexion()
+        {
+            MostrarMensaje("Error de conexión con la base de datos", Brushes.Red);
+            MessageBox.Show(MSG_ERROR_CONEXION, "Error de conexión",
+                MessageBoxButton.OK, MessageBoxImage.Error);
         }
 
         private void MostrarMensaje(string texto, Brush color)

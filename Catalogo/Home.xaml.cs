@@ -20,11 +20,12 @@ namespace Catalogo
         }
 
         // Evento para cerrar la ventana actual y reabrir el Login
+        
         private void BtnCerrarSesion_Click(object sender, RoutedEventArgs e)
         {
-            Login loginWindow = new Login();
-            loginWindow.Show();
-
+            // TC 06: Volver al formulario de login desde el principal
+            Login ventanaLogin = new Login();
+            ventanaLogin.Show();
             this.Close();
         }
     }

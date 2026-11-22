@@ -2,11 +2,22 @@
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Iniciar Sesión - Portal Videojuegos" 
-        Height="550" Width="450"
+        Height="620" Width="450"
         WindowStartupLocation="CenterScreen"
         ResizeMode="NoResize"
         Background="#1B2838">
 
+    <Window.Resources>
+        <!-- Estilo para etiquetas -->
+        <Style x:Key="FieldLabel" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#C7D5E0"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Margin" Value="0,0,0,6"/>
+        </Style>
+
+        <!-- Estilo base para cajas de entrada -->
+        <Style x:Key="InputField" TargetType="Control">
             <Setter Property="Background" Value="#171A21"/>
             <Setter Property="Foreground" Value="#FFFFFF"/>
             <Setter Property="BorderBrush" Value="#314B60"/>
@@ -23,44 +34,53 @@
 
     <!-- Contenedor principal centrado -->
     <Grid Margin="30">
+        <!-- Tarjeta de Login -->
         <Border Background="#1A2530" CornerRadius="12" 
                 BorderBrush="#314B60" BorderThickness="1.5" 
                 Padding="30,25" VerticalAlignment="Center">
 
             <StackPanel>
-                <!-- Encabezado / Logo -->
-                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE77B;" Foreground="#00E5FF" FontSize="45" HorizontalAlignment="Center" Margin="0,0,0,10" Padding="0,0,0,10"/>
+                <!-- Encabezado / Logo con icono nativo de Windows -->
+                <TextBlock FontFamily="Segoe MDL2 Assets" Text="&#xE77B;" Foreground="#00E5FF" 
+                           FontSize="45" HorizontalAlignment="Center" Margin="0,0,0,5"/>
                 <TextBlock Text="INICIAR SESIÓN" Foreground="#66C0F4" FontSize="20" FontWeight="Bold" 
-                           HorizontalAlignment="Center" Margin="0,0,0,25"/>
+                           HorizontalAlignment="Center" Margin="0,0,0,20"/>
 
                 <!-- Campo Usuario -->
                 <TextBlock Text="Nombre de usuario o correo" Style="{StaticResource FieldLabel}"/>
-                <TextBox x:Name="txtUsuario" Margin="0,0,0,18"/>
+                <TextBox x:Name="txtUsuario" Margin="0,0,0,16"/>
 
                 <!-- Campo Contraseña -->
                 <TextBlock Text="Contraseña" Style="{StaticResource FieldLabel}"/>
-                <PasswordBox x:Name="txtPassword" Margin="0,0,0,20"/>
+                <PasswordBox x:Name="txtPassword" Margin="0,0,0,16"/>
 
-                <!-- Mensaje de error/estado -->
+                <!-- Mensaje de error/estado dinámico (TC02, TC03, TC04, TC05) -->
                 <TextBlock x:Name="lblMensaje" Text="" Foreground="#E74C3C" 
-                           FontSize="12" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                           FontSize="12" FontWeight="SemiBold" TextWrapping="Wrap"
+                           HorizontalAlignment="Center" TextAlignment="Center" Margin="0,0,0,12"/>
 
-                <!-- Botón de Entrar -->
-                <Button Content="Iniciar Sesión" Height="42" 
+                <!-- Botón de Entrar (con x:Name para poder deshabilitarlo en el TC 05) -->
+                <Button x:Name="btnLogin" Content="Iniciar Sesión" Height="40" 
                         Background="#2A475E" Foreground="#FFFFFF" 
                         BorderThickness="0" FontWeight="Bold" FontSize="14" 
                         Cursor="Hand" Click="BtnLogin_Click" Margin="0,0,0,10"/>
+
+                <!-- Botón Nuevo usuario (Práctica 3: alta en la tabla Usuarios) -->
+                <Button x:Name="btnNuevoUsuario" Content="Nuevo usuario" Height="36"
+                        Background="#1E5631" Foreground="#FFFFFF"
+                        BorderThickness="0" FontWeight="SemiBold" FontSize="13"
+                        Cursor="Hand" Click="BtnNuevoUsuario_Click" Margin="0,0,0,10"/>
+
+                <!-- Botón Salir -->
+                <Button Content="Salir" Height="34" 
+                        Background="#3E2723" Foreground="#E0E0E0" 
+                        BorderThickness="0" FontWeight="SemiBold" FontSize="13" 
+                        Cursor="Hand" Click="BtnSalir_Click" Margin="0,0,0,10"/>
 
                 <!-- Enlace secundario -->
                 <Button Content="¿Olvidaste tu contraseña?" Background="Transparent" 
                         Foreground="#8F98A0" BorderThickness="0" FontSize="12" 
                         Cursor="Hand" HorizontalAlignment="Center"/>
-
-                <!-- BOTÓN SALIR -->
-                <Button Content="Salir" Height="36" 
-                        Background="#3E2723" Foreground="#E0E0E0" 
-                        BorderThickness="0" FontWeight="SemiBold" FontSize="13" 
-                        Cursor="Hand" Click="BtnSalir_Click" Margin="0,0,0,10"/>
             </StackPanel>
         </Border>
     </Grid>
